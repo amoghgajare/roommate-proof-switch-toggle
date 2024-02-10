@@ -5,12 +5,18 @@ LDR --> One leg to Vcc and the other to both analog pin 0 and to the GND via 100
 
 */
 
-#define _DEBUG 0
+#define _DEBUG 1
 int sensorPin = A0;   // select the input pin for ldr
 int sensorValue = 0;  // variable to store the value coming from the sensor
 
 void setup() {
   pinMode(3, OUTPUT); //pin connected to the Servo
+
+  #ifdef _DEBUG 
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, 0);
+  #endif
+
   Serial.begin(9600); //sets serial port for communication
 }
 
@@ -21,6 +27,9 @@ bool toggle = ldr(400);
 #ifdef _DEBUG 
 if(toggle){
 digitalWrite(LED_BUILTIN, 1);
+}
+else{
+   digitalWrite(LED_BUILTIN, 0); 
 }
 #endif  
 
