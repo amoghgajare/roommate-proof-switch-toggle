@@ -22,8 +22,24 @@ void setup() {
 
 void loop() {
   // read the value from the sensor:
-  
+int cnt = 0;
+while(cnt <= 120){
 bool toggle = ldr(400);
+if(toggle){
+  if(cnt==120){
+
+  servoToggle();
+
+  }
+delay(2000);
+cnt = cnt + 2;
+}
+else{
+  cnt=0;
+  servoToggle();
+  break;
+}
+}
 #ifdef _DEBUG 
 if(toggle){
 digitalWrite(LED_BUILTIN, 1);
