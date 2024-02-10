@@ -17,8 +17,11 @@ void setup() {
 void loop() {
   // read the value from the sensor:
   
+bool toggle = ldr(400);
 #ifdef _DEBUG 
-
+if(toggle){
+digitalWrite(LED_BUILTIN, 1);
+}
 #endif  
 
 }
