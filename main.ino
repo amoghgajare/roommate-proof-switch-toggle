@@ -4,13 +4,22 @@ Connections:
 LDR --> One leg to Vcc and the other to both analog pin 0 and to the GND via 100K resistor
 
 */
-
+#include <Servo.h>
 #define _DEBUG 1
-int sensorPin = A0;   // select the input pin for ldr
+#define defaultRetires 3
+#define LDR_THRESHOLD 400
+#define LDRsensorPin A0   // select the input pin for ldr
+#define servoPin 9
+#define servoPosUp 0
+#define servoPosDown 180
 int sensorValue = 0;  // variable to store the value coming from the sensor
+
+Servo myservo;
+
 
 void setup() {
   pinMode(3, OUTPUT); //pin connected to the Servo
+  myservo.attach(servoPin);
 
   #ifdef _DEBUG 
   pinMode(LED_BUILTIN, OUTPUT);
@@ -24,11 +33,11 @@ void loop() {
   // read the value from the sensor:
 int cnt = 0;
 while(cnt <= 120){
-bool toggle = ldr(400);
+bool toggle = ldr(LDR_THRESHOLD);
 if(toggle){
   if(cnt==120){
 
-  servoToggle();
+  servoToggle(defaultRetires);
 
   }
 delay(2000);
@@ -36,7 +45,7 @@ cnt = cnt + 2;
 }
 else{
   cnt=0;
-  servoToggle();
+  servoToggle(defaultRetires);
   break;
 }
 }
@@ -52,7 +61,7 @@ else{
 }
 
 bool ldr(int threshold){
-sensorValue = analogRead(sensorPin);   
+sensorValue = analogRead(LDRsensorPin);   
 
 #ifdef _DEBUG 
 Serial.println(sensorValue); //prints the values coming from the sensor on the screen
@@ -60,4 +69,34 @@ Serial.println(sensorValue); //prints the values coming from the sensor on the s
 delay(100);  
 return (sensorValue>threshold); 
 
+}
+
+void servoToggle(int retires = 3){
+  for(int i=0; i<retires; i++){
+    position_servo(servoPosUp);
+    delay(15);
+    if(~ldr(LDR_THRESHOLD)){
+      #ifdef _DEBUG
+        Serial.println("Light Turned off, switch position was up, not trying again");
+      #endif
+      return;
+    }
+    position_servo(servoPosDown);
+    delay(15);
+    if(~ldr(servoPosDown)){
+      #ifdef _DEBUG
+        Serial.println("Light Turned off, switch position was down, not trying again");
+      #endif
+      return;
+    }
+  }
+  #ifdef _DEBUG
+    Serial.println("Could not Switch light off");
+  #endif
+
+}
+
+void position_servo(int angle){
+  myservo.write(angle);
+  delay(15);
 }
